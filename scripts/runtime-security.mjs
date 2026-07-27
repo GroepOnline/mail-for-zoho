@@ -253,7 +253,8 @@ export function buildChildEnv(source = process.env, { profile = null } = {}) {
   env.npm_config_update_notifier = 'false';
   env.npm_config_registry = 'https://registry.npmjs.org/';
   env.npm_config_userconfig = process.platform === 'win32' ? 'NUL' : '/dev/null';
-  env.npm_config_globalconfig = process.platform === 'win32' ? 'NUL' : '/dev/null';
+  // Do not set npm_config_globalconfig to /dev/null when userconfig is also /dev/null;
+  // Node 22 / npm 10+ panics with "double-loading config /dev/null as global".
   return env;
 }
 
