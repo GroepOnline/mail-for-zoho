@@ -1,0 +1,47 @@
+{
+  "name": "mail-for-zoho",
+  "version": "0.4.0",
+  "description": "Open-source workflows for reading, searching and safely organizing authorized Zoho Mail inboxes through Zoho's official MCP server.",
+  "author": {
+    "name": "OnlineChefGroep",
+    "email": "chefadmin@chefgroep.online",
+    "url": "https://chefgroep.nl"
+  },
+  "homepage": "https://github.com/OnlineChefGroep/mail-for-zoho",
+  "repository": "https://github.com/OnlineChefGroep/mail-for-zoho",
+  "license": "MIT",
+  "keywords": [
+    "zoho-mail",
+    "email",
+    "inbox",
+    "triage",
+    "search",
+    "mcp",
+    "chatgpt"
+  ],
+  "skills": "./skills/zoho-mail/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Mail for Zoho",
+    "shortDescription": "Read, search and safely organize authorized Zoho Mail inboxes",
+    "longDescription": "An unofficial open-source plugin that connects ChatGPT or Codex directly to Zoho's official remote MCP server. It discovers authorized mailboxes, searches folders and messages, reads message content and attachment metadata, and supports low-risk read-state or flag updates. The project does not proxy mailbox traffic or store Zoho OAuth tokens.",
+    "developerName": "OnlineChefGroep",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/OnlineChefGroep/mail-for-zoho",
+    "privacyPolicyURL": "https://github.com/OnlineChefGroep/mail-for-zoho/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/OnlineChefGroep/mail-for-zoho/blob/main/TERMS.md",
+    "defaultPrompt": [
+      "Summarize the actionable mail in my Zoho inbox.",
+      "Find the latest Zoho Mail thread about a project and explain what changed.",
+      "Draft a reply to this Zoho Mail thread without sending it."
+    ],
+    "brandColor": "#E42527",
+    "composerIcon": "./assets/mail-for-zoho.svg",
+    "screenshots": []
+  }
+}

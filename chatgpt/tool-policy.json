@@ -1,0 +1,57 @@
+{
+  "format": "mail-for-zoho.mcp-tool-policy/v1",
+  "default": "deny",
+  "enforcement": {
+    "direct_remote_runtime_filter": false,
+    "local_bridge_runtime_filter": true,
+    "mechanisms": [
+      "upstream_zoho_tool_selection",
+      "chatgpt_action_controls_when_available",
+      "preflight_tool_surface_verification",
+      "local_mcp_remote_ignore_tool_filter"
+    ],
+    "note": "The direct ChatGPT-to-Zoho path is not proxied or filtered by this repository. Configure the Zoho MCP server with only approved tools, review ChatGPT action controls, and rerun the verifier after any server change. The optional local bridge adds a defense-in-depth --ignore-tool filter."
+  },
+  "groups": {
+    "read": {
+      "allow": true,
+      "approval": "normal",
+      "tools": [
+        "ZohoMail_getMailAccounts",
+        "ZohoMail_getAllFolders",
+        "ZohoMail_getFolder",
+        "ZohoMail_listEmails",
+        "ZohoMail_SearchEmails",
+        "ZohoMail_getMessageDetails",
+        "ZohoMail_getMessageContent",
+        "ZohoMail_getOriginalMessage",
+        "ZohoMail_getMessageAttachmentInfo",
+        "ZohoMail_getAccountDetails"
+      ]
+    },
+    "low_risk_write": {
+      "allow": true,
+      "approval": "important-actions",
+      "tools": [
+        "ZohoMail_readMessages",
+        "ZohoMail_flagMessages"
+      ]
+    },
+    "outbound_or_destructive": {
+      "allow": false,
+      "approval": "blocked",
+      "name_patterns": [
+        "send",
+        "reply",
+        "forward",
+        "delete",
+        "trash",
+        "purge",
+        "delegate",
+        "delegation",
+        "admin",
+        "security"
+      ]
+    }
+  }
+}

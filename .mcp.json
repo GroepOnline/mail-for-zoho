@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "mail-for-zoho": {
+      "command": "node",
+      "args": ["./scripts/run-local.mjs"],
+      "cwd": ".",
+      "env_vars": [
+        "ZOHO_MCP_URL",
+        "ZOHO_MCP_ENV"
+      ],
+      "tool_timeout_sec": 120
+    }
+  }
+}

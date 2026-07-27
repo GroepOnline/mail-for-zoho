@@ -1,0 +1,58 @@
+{
+  "format": "mail-for-zoho.chatgpt-mcp-install/v1",
+  "name": "Mail for Zoho",
+  "short_description": "Read, search and safely organize authorized Zoho Mail inboxes.",
+  "long_description": "Unofficial open-source ChatGPT app package for mailbox discovery, folders, message search, message content, attachment metadata, read state and flags through Zoho's official MCP service. Sending, replying, forwarding, deleting, trashing and purging are excluded from the approved baseline and must not be selected on the upstream Zoho MCP server.",
+  "endpoint": {
+    "source": "environment",
+    "environment_variable": "ZOHO_MCP_URL",
+    "transport": "streamable-http",
+    "must_be_https": true,
+    "secret": true
+  },
+  "authentication": {
+    "mode": "upstream-managed",
+    "protocol": "OAuth 2.1",
+    "note": "Use the authentication behavior of the generated official Zoho MCP endpoint. Do not invent OAuth client metadata in this repository."
+  },
+  "policy_enforcement": {
+    "direct_remote_runtime_filter": false,
+    "local_bridge_runtime_filter": true,
+    "upstream_tool_selection_required": true,
+    "live_verification_required": true,
+    "note": "The direct ChatGPT-to-Zoho path is enforced by Zoho server configuration and ChatGPT action controls, then checked by the remote verifier. The optional local bridge adds --ignore-tool filtering as defense in depth."
+  },
+  "visibility": "custom-or-managed-workspace",
+  "required_tools": [
+    "ZohoMail_getMailAccounts",
+    "ZohoMail_getAllFolders",
+    "ZohoMail_listEmails",
+    "ZohoMail_SearchEmails",
+    "ZohoMail_getMessageDetails",
+    "ZohoMail_getMessageContent"
+  ],
+  "optional_tools": [
+    "ZohoMail_getFolder",
+    "ZohoMail_getOriginalMessage",
+    "ZohoMail_getMessageAttachmentInfo",
+    "ZohoMail_readMessages",
+    "ZohoMail_flagMessages",
+    "ZohoMail_getAccountDetails"
+  ],
+  "forbidden_tool_name_patterns": [
+    "send",
+    "reply",
+    "forward",
+    "delete",
+    "trash",
+    "purge",
+    "delegate",
+    "delegation",
+    "admin",
+    "security"
+  ],
+  "privacy_policy_document": "PRIVACY.md",
+  "security_document": "SECURITY.md",
+  "support_document": "SUPPORT.md",
+  "terms_document": "TERMS.md"
+}

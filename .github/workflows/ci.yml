@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ${{ github.event.repository.private && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Validate plugin and runtime contract
+        run: npm run check:config
+      - name: Scan for embedded Zoho endpoints
+        env:
+          SECRET_SCAN_MODE: endpoints
+        run: npm run check:secrets
+      - name: Scan for common token and key patterns
+        env:
+          SECRET_SCAN_MODE: patterns
+        run: npm run check:secrets
+      - name: Validate OpenAI submission packet
+        run: npm run check:submission
+      - name: Validate public-source hygiene
+        run: npm run check:public
+      - name: Parse executable JavaScript
+        run: npm run check:node
+      - name: Run runtime security tests
+        run: npm run test:runtime

@@ -1,0 +1,13 @@
+Mail for Zoho
+Copyright 2026 OnlineChefGroep
+
+This is an unofficial open-source integration maintained by OnlineChefGroep.
+It is not affiliated with, sponsored by, or endorsed by Zoho Corporation or OpenAI.
+
+Zoho and Zoho Mail are trademarks of Zoho Corporation. ChatGPT and OpenAI are
+trademarks of OpenAI. Their names are used only to identify compatibility with
+the respective services.
+
+The integration connects clients directly to Zoho's official MCP service. It
+does not operate a mailbox proxy and does not receive or store users' Zoho OAuth
+tokens or generated Zoho MCP endpoint URLs.

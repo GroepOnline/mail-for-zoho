@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "format": "onlinechefgroep.openai-plugin-submission/v1",
+  "status": "ready_for_platform_registration",
+  "plugin": {
+    "name": "mail-for-zoho",
+    "display_name": "Mail for Zoho",
+    "publisher": "OnlineChefGroep",
+    "category": "Productivity",
+    "tagline": "Read, search and safely organize authorized Zoho Mail inboxes.",
+    "repository": "https://github.com/OnlineChefGroep/mail-for-zoho",
+    "support_url": "https://github.com/OnlineChefGroep/mail-for-zoho/issues",
+    "privacy_url": "https://github.com/OnlineChefGroep/mail-for-zoho/blob/main/PRIVACY.md",
+    "terms_url": "https://github.com/OnlineChefGroep/mail-for-zoho/blob/main/TERMS.md",
+    "license": "MIT",
+    "unofficial_integration": true
+  },
+  "app_template": {
+    "required": true,
+    "platform_managed": true,
+    "app_id": null,
+    "template_id": null,
+    "connection": {
+      "provider": "Zoho MCP",
+      "transport": "streamable_http",
+      "direct_provider_connection": true,
+      "intermediary_server": false,
+      "authentication": "oauth",
+      "upstream_protocol": "OAuth 2.1",
+      "admin_inputs": [
+        {
+          "name": "zoho_mcp_url",
+          "label": "Zoho MCP server URL",
+          "type": "secret_url",
+          "required": true,
+          "sensitive": true,
+          "help": "Create or select a Zoho MCP server, choose only the approved Zoho Mail tools, then copy its unique connection URL. Treat the URL as a password."
+        }
+      ]
+    },
+    "publish_behavior": {
+      "admin_creates_workspace_app": true,
+      "members_connect_with_oauth": true,
+      "developer_mode_required_after_publish": false
+    }
+  },
+  "capability_policy": {
+    "baseline": "inbound_first",
+    "enforcement": {
+      "direct_remote_runtime_filter": false,
+      "local_bridge_runtime_filter": true,
+      "upstream_tool_selection_required": true,
+      "chatgpt_action_review_required": true,
+      "live_tool_surface_verification_required": true
+    },
+    "allowed": [
+      "mailbox_discovery",
+      "folder_discovery",
+      "message_list",
+      "message_search",
+      "message_read",
+      "attachment_metadata",
+      "mark_read_unread",
+      "flag_unflag",
+      "draft_text_in_chat"
+    ],
+    "forbidden": [
+      "send",
+      "reply",
+      "forward",
+      "delete",
+      "trash",
+      "purge",
+      "mail_admin",
+      "delegation_changes",
+      "security_setting_changes"
+    ]
+  },
+  "starter_prompts": [
+    "Summarize the actionable mail in my Zoho inbox.",
+    "Find the latest Zoho Mail thread about a project and explain what changed.",
+    "Draft a reply to this Zoho Mail thread without sending it."
+  ]
+}

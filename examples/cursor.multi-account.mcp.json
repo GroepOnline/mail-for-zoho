@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mail-for-zoho-work": {
+      "command": "node",
+      "args": ["./scripts/run-local.mjs", "--profile", "work"],
+      "cwd": "${workspaceFolder}",
+      "tool_timeout_sec": 120
+    },
+    "mail-for-zoho-personal": {
+      "command": "node",
+      "args": ["./scripts/run-local.mjs", "--profile", "personal"],
+      "cwd": "${workspaceFolder}",
+      "tool_timeout_sec": 120
+    }
+  }
+}

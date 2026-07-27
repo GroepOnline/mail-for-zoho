@@ -1,0 +1,31 @@
+name: remote Zoho MCP smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zoho-remote-smoke
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    environment: zoho-remote-smoke
+    runs-on: ${{ github.event.repository.private && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: npm test
+      - name: Verify remote MCP tool surface
+        env:
+          ZOHO_MCP_URL: ${{ secrets.ZOHO_MCP_URL }}
+          ZOHO_MCP_VERIFY_TIMEOUT_MS: 45000
+        run: npm run verify:remote

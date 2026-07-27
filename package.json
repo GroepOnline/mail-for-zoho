@@ -1,0 +1,22 @@
+{
+  "name": "@onlinechefgroep/mail-for-zoho",
+  "version": "0.4.0",
+  "private": false,
+  "type": "module",
+  "license": "MIT",
+  "description": "Open-source OpenAI plugin package and direct bridge to Zoho's official Mail MCP endpoint.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check:config": "node scripts/verify-config.mjs",
+    "check:secrets": "node scripts/verify-secrets.mjs",
+    "check:submission": "node scripts/verify-submission.mjs",
+    "check:public": "node scripts/verify-public-source.mjs",
+    "check:node": "node --check scripts/runtime-security.mjs && node --check scripts/run-local.mjs && node --check scripts/verify-remote.mjs && node --check scripts/verify-secrets.mjs && node --check scripts/verify-submission.mjs && node --check scripts/verify-public-source.mjs",
+    "test:runtime": "node --test tests/runtime-security.test.mjs",
+    "check": "npm run check:config && npm run check:secrets && npm run check:submission && npm run check:public && npm run check:node && npm run test:runtime",
+    "test": "npm run check",
+    "verify:remote": "node scripts/verify-remote.mjs"
+  }
+}
