@@ -113,12 +113,14 @@ async function main() {
   child.on('error', (error) => stop(1, `failed to start ${MCP_REMOTE_SPEC}: ${redactSensitive(error.message, secrets)}`));
   child.on('exit', (code) => {
     if (!finished && code !== 0) {
-      stop(1, `${MCP_REMOTE_SPEC} exited with code ${code}: ${stderr.trim()}`);
+      const safeError = redactSensitive(stderr, secrets).trim();
+      stop(1, `${MCP_REMOTE_SPEC} exited with code ${code}: ${safeError}`);
     }
   });
 
   const timer = setTimeout(() => {
-    stop(1, `remote verification timed out after ${timeoutMs}ms${stderr ? `: ${stderr.trim()}` : ''}`);
+    const safeError = redactSensitive(stderr, secrets).trim();
+    stop(1, `remote verification timed out after ${timeoutMs}ms${safeError ? `: ${safeError}` : ''}`);
   }, timeoutMs);
 
   try {

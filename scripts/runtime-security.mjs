@@ -291,7 +291,7 @@ export function bridgeArgs(endpoint, { filterTools = false } = {}) {
   return args;
 }
 
-export function redactSensitive(value, endpoints = []) {
+export function redactSensitive(value, endpoints = [], { unknownUrls = true } = {}) {
   if (!Array.isArray(endpoints)) {
     throw new Error('redactSensitive requires an endpoints array');
   }
@@ -325,7 +325,13 @@ export function redactSensitive(value, endpoints = []) {
   for (const secret of [...secrets].filter(Boolean).sort((a, b) => b.length - a.length)) {
     text = text.replaceAll(secret, '[REDACTED]');
   }
-  return text.replace(/https:\/\/[^\s"'<>]+/gi, '[REDACTED_URL]');
+  // Catch-all HTTPS scrubbing is only safe on final/complete text. Applying it
+  // to a growing stream peels prefixes like `https://s`, which splits the real
+  // endpoint so later known-secret matches miss the remaining host fragment.
+  if (unknownUrls) {
+    text = text.replace(/https:\/\/[^\s"'<>]+/gi, '[REDACTED_URL]');
+  }
+  return text;
 }
 
 // Retain more than the worst-case length of any single redacted secret variant
@@ -333,14 +339,22 @@ export function redactSensitive(value, endpoints = []) {
 // can never be split across a retain/overflow boundary and escape redaction.
 export const STDERR_RETAIN_BYTES = MAX_ENDPOINT_LENGTH * 8;
 
-/** Redact then retain: used by CI verifiers that buffer stderr for reports. */
+/**
+ * Raw-carry stderr accumulator for CI verifiers.
+ * The returned string is RAW (unredacted) and must be passed back as `current`
+ * on the next call. Callers MUST run redactSensitive() before printing.
+ */
 export function appendRedactedStderr(current, incoming, endpoints, retainBytes = STDERR_RETAIN_BYTES) {
   if (!Array.isArray(endpoints)) {
     throw new Error('appendRedactedStderr requires an endpoints array');
   }
-  let next = String(current ?? '') + redactSensitive(String(incoming ?? ''), endpoints);
-  if (next.length > retainBytes) next = next.slice(-retainBytes);
-  return next;
+  // Keep a bounded RAW carry window. Never redact into the carry: the catch-all
+  // HTTPS scrubber peels incomplete URLs (`https://s`…) and permanently splits
+  // secrets so later chunks cannot match. Truncation is safe because the retain
+  // window is larger than any single secret variant.
+  let raw = String(current ?? '') + String(incoming ?? '');
+  if (raw.length > retainBytes) raw = raw.slice(-retainBytes);
+  return raw;
 }
 
 /** Stream-through line redactor: used by the local MCP launcher. */
@@ -348,6 +362,9 @@ export function relayRedactedStderr(stream, endpoints, write = (value) => proces
   if (!Array.isArray(endpoints)) {
     throw new Error('relayRedactedStderr requires an endpoints array');
   }
+  // Incomplete mid-line data stays RAW. Complete lines and the final flush use
+  // full redaction (including unknown HTTPS URLs). Overflow uses known-secret
+  // redaction only so a growing `https://` prefix is not peeled mid-stream.
   let pending = '';
 
   const flushLines = () => {
@@ -360,9 +377,15 @@ export function relayRedactedStderr(stream, endpoints, write = (value) => proces
     pending += chunk.toString('utf8');
     flushLines();
     if (pending.length > STDERR_RETAIN_BYTES * 2) {
-      const safePrefixLength = pending.length - STDERR_RETAIN_BYTES;
-      write(redactSensitive(pending.slice(0, safePrefixLength), endpoints));
-      pending = pending.slice(safePrefixLength);
+      // Redact the whole RAW window before splitting so a secret straddling the
+      // cut still matches. Skip unknown-URL scrubbing: this buffer is mid-line
+      // and would otherwise peel `https://` prefixes. The retained tail is larger
+      // than any secret variant, so no complete secret can span the cut after
+      // known-secret redaction.
+      const redacted = redactSensitive(pending, endpoints, { unknownUrls: false });
+      const flushEnd = Math.max(0, redacted.length - STDERR_RETAIN_BYTES);
+      if (flushEnd > 0) write(redacted.slice(0, flushEnd));
+      pending = redacted.slice(flushEnd);
     }
   });
 

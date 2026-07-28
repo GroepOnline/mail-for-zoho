@@ -397,8 +397,69 @@ test('appendRedactedStderr redacts before truncating across the retain boundary'
 
   let stderr = '';
   stderr = appendRedactedStderr(stderr, `${'x'.repeat(STDERR_RETAIN_BYTES)}${encoded}`, [endpoint]);
-  assert.doesNotMatch(stderr, /overflow\.mcp\.example|%25%25%25%25%25/);
-  assert.match(stderr, /REDACTED/);
+  const safe = redactSensitive(stderr, [endpoint]);
+  assert.doesNotMatch(safe, /overflow\.mcp\.example|%25%25%25%25%25/);
+  assert.match(safe, /REDACTED/);
+});
+
+test('appendRedactedStderr redacts a secret split across separate appends', () => {
+  const host = 'work.mcp.example.test';
+  const endpoint = `https://${host}/connect?key=work-secret`;
+  const mid = Math.floor(host.length / 2);
+
+  let stderr = '';
+  stderr = appendRedactedStderr(stderr, `resolving ${host.slice(0, mid)}`, [endpoint]);
+  stderr = appendRedactedStderr(stderr, `${host.slice(mid)} failed`, [endpoint]);
+  const safe = redactSensitive(stderr, [endpoint]);
+  assert.doesNotMatch(safe, /work\.mcp\.example\.test/);
+  assert.match(safe, /REDACTED/);
+});
+
+test('appendRedactedStderr does not peel https prefixes across one-byte chunks', () => {
+  const endpoint = 'https://secret.mcp.example.test/connect?key=super-secret-token-xyz';
+  let stderr = '';
+  for (const ch of `failure: ${endpoint}\n`) {
+    stderr = appendRedactedStderr(stderr, ch, [endpoint]);
+  }
+  const safe = redactSensitive(stderr, [endpoint]);
+  assert.doesNotMatch(safe, /super-secret|secret\.mcp\.example|ecret\.mcp/);
+  assert.match(safe, /REDACTED/);
+});
+
+test('relayRedactedStderr does not peel https prefixes across one-byte chunks', async () => {
+  const endpoint = 'https://secret.mcp.example.test/connect?key=super-secret-token-xyz';
+  const stream = new PassThrough();
+  let output = '';
+  relayRedactedStderr(stream, [endpoint], (value) => {
+    output += value;
+  });
+  for (const ch of `failure: ${endpoint}\n`) {
+    stream.write(ch);
+  }
+  stream.end();
+  await new Promise((resolve) => stream.on('close', resolve));
+  assert.doesNotMatch(output, /super-secret|secret\.mcp\.example|ecret\.mcp/);
+  assert.match(output, /REDACTED/);
+});
+
+test('stderr relay redacts a secret straddling the overflow flush boundary', async () => {
+  const host = 'boundary.mcp.example.test';
+  const endpoint = `https://${host}/connect?key=boundary-secret`;
+
+  const stream = new PassThrough();
+  let output = '';
+  relayRedactedStderr(stream, [endpoint], (value) => {
+    output += value;
+  });
+
+  const lead = STDERR_RETAIN_BYTES + 512;
+  const trail = STDERR_RETAIN_BYTES - Math.floor(host.length / 2);
+  stream.write(`${'x'.repeat(lead)}${host}${'y'.repeat(trail)}`);
+  stream.end('\n');
+  await new Promise((resolve) => stream.on('close', resolve));
+
+  assert.doesNotMatch(output, /boundary\.mcp\.example\.test/);
+  assert.match(output, /REDACTED/);
 });
 
 test('mocked two-profile launches use separate endpoints and auth directories', async () => {
