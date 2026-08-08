@@ -2,8 +2,8 @@
 name: mail-for-zoho-mail-ops
 role: satellite
 ambient: true
-description: |-
-  mail-for-zoho-specifieke mail-ops-feiten. Chains up to mail-ops-meta voor procedure, invarianten en safety gates.
+description: mail-for-zoho-specifieke mail-ops-feiten.
+details: Chains up to mail-ops-meta voor procedure, invarianten en safety gates.
 use:
 - "zoho mail"
 - "inbox check"

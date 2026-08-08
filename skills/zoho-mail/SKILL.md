@@ -1,12 +1,8 @@
 ---
 name: zoho-mail
 summary: Safely read, search and triage authorized Zoho Mail inboxes through Zoho's official MCP server.
-description: >-
-  Use for Zoho Mail inbox checks, unread or action triage, message search,
-  thread reading, attachment discovery, read-state updates, flags and drafting
-  follow-up text. Always discover live mailbox account IDs. Never send, reply,
-  forward, delete, trash or purge unless a separately reviewed release explicitly
-  enables those actions and ChatGPT requires confirmation.
+description: Use for Zoho Mail inbox checks, unread or action triage, message search, thread reading, attachment discovery, read-state updates, flags and drafting follow-up text.
+details: Always discover live mailbox account IDs. Never send, reply, forward, delete, trash or purge unless a separately reviewed release explicitly enables those actions and ChatGPT requires confirmation.
 ---
 
 # Mail for Zoho
