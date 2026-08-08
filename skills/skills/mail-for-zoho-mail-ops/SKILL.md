@@ -3,15 +3,15 @@ name: mail-for-zoho-mail-ops
 role: satellite
 ambient: true
 description: mail-for-zoho-specifieke mail-ops-feiten.
-details: Chains up to mail-ops-meta voor procedure, invarianten en safety gates.
+details: Chains up to company-ops-meta voor procedure, invarianten en safety gates.
 use:
 - "zoho mail"
 - "inbox check"
 - "mail triage"
-extends: mail-ops-meta
+extends: company-ops-meta
 chains:
   skills:
-  - mail-ops-meta
+  - company-ops-meta
 invocable-by:
 - user
 - agent
@@ -24,7 +24,7 @@ context:
   repos: ['/home/sofie/mail-for-zoho']
   signals: []
 owner: chefgroep
-domain: mail-ops
+domain: company-ops
 risk: read-only
 last_reviewed: '2026-08-08'
 ---
