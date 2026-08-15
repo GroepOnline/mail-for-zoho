@@ -25,10 +25,16 @@
   },
   "files": [
     ".codex-plugin",
+    ".mcp.json",
+    ".env.example",
     "chatgpt",
     "openai",
     "examples",
     "assets",
+    "scripts",
+    "skills",
+    "tests",
+    "NOTICE",
     "*.md",
     "*.json",
     "*.mjs"
