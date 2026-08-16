@@ -1,5 +1,5 @@
 {
-  "name": "@onlinechefgroep/mail-for-zoho",
+  "name": "@groeponline/mail-for-zoho",
   "version": "0.4.0",
   "private": false,
   "type": "module",
@@ -18,5 +18,25 @@
     "check": "npm run check:config && npm run check:secrets && npm run check:submission && npm run check:public && npm run check:node && npm run test:runtime",
     "test": "npm run check",
     "verify:remote": "node scripts/verify-remote.mjs"
-  }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "files": [
+    ".codex-plugin",
+    ".mcp.json",
+    ".env.example",
+    "chatgpt",
+    "openai",
+    "examples",
+    "assets",
+    "scripts",
+    "skills",
+    "tests",
+    "NOTICE",
+    "*.md",
+    "*.json",
+    "*.mjs"
+  ]
 }
