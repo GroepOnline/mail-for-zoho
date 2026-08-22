@@ -7,8 +7,8 @@
     "email": "chefadmin@chefgroep.online",
     "url": "https://chefgroep.nl"
   },
-  "homepage": "https://github.com/OnlineChefGroep/mail-for-zoho",
-  "repository": "https://github.com/OnlineChefGroep/mail-for-zoho",
+  "homepage": "https://github.com/GroepOnline/mail-for-zoho",
+  "repository": "https://github.com/GroepOnline/mail-for-zoho",
   "license": "MIT",
   "keywords": [
     "zoho-mail",
@@ -32,9 +32,9 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/OnlineChefGroep/mail-for-zoho",
-    "privacyPolicyURL": "https://github.com/OnlineChefGroep/mail-for-zoho/blob/main/PRIVACY.md",
-    "termsOfServiceURL": "https://github.com/OnlineChefGroep/mail-for-zoho/blob/main/TERMS.md",
+    "websiteURL": "https://github.com/GroepOnline/mail-for-zoho",
+    "privacyPolicyURL": "https://github.com/GroepOnline/mail-for-zoho/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/GroepOnline/mail-for-zoho/blob/main/TERMS.md",
     "defaultPrompt": [
       "Summarize the actionable mail in my Zoho inbox.",
       "Find the latest Zoho Mail thread about a project and explain what changed.",
