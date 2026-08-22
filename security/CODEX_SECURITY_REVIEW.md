@@ -1,7 +1,7 @@
 # Codex Security review — public clean source branch
 
 Date: 2026-07-26  
-Repository: `OnlineChefGroep/zoho-mail-mcp`  
+Repository: `GroepOnline/zoho-mail-mcp`  
 Pull request: #5  
 Branch: `release/public-clean-source`  
 Base commit: `57df983ae193ba82c0ad46fe01bbcc4c7530a210`  
