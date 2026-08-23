@@ -14,7 +14,6 @@ jobs:
   verify:
     if: github.ref == 'refs/heads/main'
     environment: zoho-remote-smoke
-    # GitHub-hosted runners banned until Actions spending restored.
     runs-on: fromJSON('["self-hosted","Linux","X64","heavy"]')
     timeout-minutes: 5
     steps:
