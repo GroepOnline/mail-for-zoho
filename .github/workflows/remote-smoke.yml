@@ -14,7 +14,7 @@ jobs:
   verify:
     if: github.ref == 'refs/heads/main'
     environment: zoho-remote-smoke
-    runs-on: fromJSON('["self-hosted","Linux","X64","heavy"]')
+    runs-on: ${{ fromJSON('["self-hosted","Linux","X64","heavy"]') }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
