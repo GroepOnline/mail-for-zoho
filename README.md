@@ -108,3 +108,5 @@ Before submission:
 - add `.app.json` only after OpenAI supplies a real app ID.
 
 See [`openai/SUBMISSION.md`](openai/SUBMISSION.md), [`PRIVACY.md`](PRIVACY.md), [`TERMS.md`](TERMS.md), [`SECURITY.md`](SECURITY.md), [`SUPPORT.md`](SUPPORT.md) and [`NOTICE`](NOTICE).
+
+Product tags, GitHub Release artifacts and `run-local --version` identity: [`docs/release.md`](docs/release.md).

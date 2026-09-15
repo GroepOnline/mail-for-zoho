@@ -3,6 +3,7 @@
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
+import { readPackageVersion } from './product-identity.mjs';
 import {
   appendRedactedStderr,
   bridgeInvocation,
@@ -127,7 +128,7 @@ async function main() {
     const initialized = await request(1, 'initialize', {
       protocolVersion: '2025-06-18',
       capabilities: {},
-      clientInfo: { name: 'mail-for-zoho-verifier', version: '0.2.0' },
+      clientInfo: { name: 'mail-for-zoho-verifier', version: readPackageVersion() },
     });
     notify('notifications/initialized');
 

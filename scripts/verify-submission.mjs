@@ -24,6 +24,7 @@ async function exists(relativePath) {
 }
 
 const plugin = await readJson('.codex-plugin/plugin.json');
+const pkg = await readJson('package.json');
 const submission = await readJson('openai/submission.json');
 const evals = await readJson('openai/evals.json');
 const skill = await readFile(path.join(root, 'skills/zoho-mail/SKILL.md'), 'utf8');
@@ -32,7 +33,7 @@ const terms = await readFile(path.join(root, 'TERMS.md'), 'utf8');
 const notice = await readFile(path.join(root, 'NOTICE'), 'utf8');
 
 assert(plugin.name === 'mail-for-zoho', 'plugin name must be mail-for-zoho');
-assert(plugin.version === '0.4.0', 'plugin version must match the submission release');
+assert(plugin.version === pkg.version, 'plugin version must match package.json');
 assert(plugin.license === 'MIT', 'public plugin must use the MIT license');
 assert(plugin.skills === './skills/zoho-mail/', 'plugin must load only the generic Zoho skill');
 assert(plugin.mcpServers === './.mcp.json', 'plugin must reference the MCP launcher');

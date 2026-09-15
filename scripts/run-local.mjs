@@ -42,6 +42,12 @@ export async function launchLocal({
 }
 
 async function main() {
+  if (process.argv[2] === '--version' && process.argv.length === 3) {
+    const { readProductIdentity } = await import('./product-identity.mjs');
+    process.stdout.write(`${JSON.stringify(readProductIdentity())}\n`);
+    return;
+  }
+
   let runtime;
   try {
     runtime = await launchLocal();
