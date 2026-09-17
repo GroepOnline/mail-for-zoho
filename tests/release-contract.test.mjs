@@ -57,6 +57,26 @@ test('workflow verifies tag equals version sources and sits on origin/main', () 
   assert.doesNotMatch(workflow, /NPM_TOKEN|NODE_AUTH_TOKEN/);
 });
 
+test('release concurrency serializes tag push and backfill on the same key', () => {
+  assert.match(workflow, /group: release-\$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.tag \|\| github\.ref_name \}\}/);
+});
+
+test('release tag fetch updates the origin/main tracking ref', () => {
+  const source = readFileSync(
+    path.join(root, 'scripts', 'verify-release-tag.mjs'),
+    'utf8',
+  );
+  assert.match(
+    source,
+    /'fetch', '--no-tags', 'origin', '\+refs\/heads\/main:refs\/remotes\/origin\/main'/,
+  );
+});
+
+test('design-system push trigger is limited to main', () => {
+  const design = readFileSync(path.join(workflowsDir, 'design-system-contract.yml'), 'utf8');
+  assert.match(design, /push:\n +branches: \[main\]/);
+});
+
 test('package.json and plugin.json versions agree', () => {
   const version = sourcesAgree();
   assert.match(version, /^\d+\.\d+\.\d+$/);

@@ -41,10 +41,16 @@ export function verifyTagEqualsVersion(tag, sources = versionSources()) {
 }
 
 export function verifyAncestorOfMain(sha, mainRef = 'origin/main') {
-  const fetch = spawnSync('git', ['fetch', '--no-tags', 'origin', 'main'], {
-    cwd: root,
-    encoding: 'utf8',
-  });
+  // Update the remote-tracking ref, not just FETCH_HEAD, so the ancestry
+  // check cannot pass or fail on a stale origin/main.
+  const fetch = spawnSync(
+    'git',
+    ['fetch', '--no-tags', 'origin', '+refs/heads/main:refs/remotes/origin/main'],
+    {
+      cwd: root,
+      encoding: 'utf8',
+    },
+  );
   if (fetch.status !== 0) {
     throw new Error((fetch.stderr || '').trim() || 'git fetch origin main failed');
   }

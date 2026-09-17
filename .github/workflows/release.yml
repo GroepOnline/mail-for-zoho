@@ -19,7 +19,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+  # ref_name yields vX.Y.Z for both a tag push (refs/tags/vX.Y.Z) and a
+  # workflow_dispatch backfill (inputs.tag), so both paths serialize.
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
