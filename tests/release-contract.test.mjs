@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -14,32 +14,21 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const workflowsDir = path.join(root, '.github/workflows');
 const workflow = readFileSync(path.join(workflowsDir, 'release.yml'), 'utf8');
-const HOSTED_RUNNER = /^\s*runs-on:\s*.*(ubuntu-latest|macos-latest|windows-latest)/;
-const FLEET_PR_OR_HEAVY =
-  "runs-on: ${{ github.event_name == 'pull_request' && fromJSON('[\"self-hosted\",\"Linux\",\"X64\",\"pr-isolated\"]') || fromJSON('[\"self-hosted\",\"Linux\",\"X64\",\"heavy\"]') }}";
-const FLEET_HEAVY = 'runs-on: [self-hosted, Linux, X64, heavy]';
+const PUBLIC_HOSTED = ['ci.yml', 'design-system-contract.yml', 'publish.yml', 'release.yml'];
+const REMOTE_SMOKE_HEAVY =
+  "runs-on: ${{ fromJSON('[\"self-hosted\",\"Linux\",\"X64\",\"heavy\"]') }}";
 
-test('workflows do not use GitHub-hosted runners', () => {
-  for (const name of readdirSync(workflowsDir)) {
-    if (!name.endsWith('.yml')) continue;
+test('public workflows use GitHub-hosted runners', () => {
+  for (const name of PUBLIC_HOSTED) {
     const text = readFileSync(path.join(workflowsDir, name), 'utf8');
-    for (const line of text.split('\n')) {
-      assert.doesNotMatch(line, HOSTED_RUNNER, `${name}: ${line}`);
-    }
+    assert.match(text, /^\s*runs-on:\s*ubuntu-latest\s*$/m, name);
+    assert.doesNotMatch(text, /self-hosted/, name);
   }
 });
 
-test('ci and design-system jobs use pr-isolated or heavy', () => {
-  const ci = readFileSync(path.join(workflowsDir, 'ci.yml'), 'utf8');
-  const design = readFileSync(path.join(workflowsDir, 'design-system-contract.yml'), 'utf8');
-  assert.ok(ci.includes(FLEET_PR_OR_HEAVY));
-  assert.ok(design.includes(FLEET_PR_OR_HEAVY));
-});
-
-test('publish and release jobs use heavy', () => {
-  const publish = readFileSync(path.join(workflowsDir, 'publish.yml'), 'utf8');
-  assert.ok(publish.includes(FLEET_HEAVY));
-  assert.match(workflow, /self-hosted/);
+test('remote smoke keeps the heavy self-hosted label', () => {
+  const smoke = readFileSync(path.join(workflowsDir, 'remote-smoke.yml'), 'utf8');
+  assert.ok(smoke.includes(REMOTE_SMOKE_HEAVY));
 });
 
 test('workflow verifies tag equals version sources and sits on origin/main', () => {
