@@ -1,0 +1,96 @@
+name: Release
+
+# Product tag vX.Y.Z must equal package.json and plugin.json. This workflow
+# packs the npm artifact, writes SHA256SUMS, and creates the GitHub Release.
+# npm publish stays on publish.yml — this job does not change that target.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing vX.Y.Z tag to backfill (re-verify at that tag's commit)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  # ref_name yields vX.Y.Z for both a tag push (refs/tags/vX.Y.Z) and a
+  # workflow_dispatch backfill (inputs.tag), so both paths serialize.
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Pack artifact and GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Resolve tag
+        id: rel
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          case "$TAG" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "tag ${TAG} is not vX.Y.Z" >&2; exit 1 ;;
+          esac
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ steps.rel.outputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Stamp identity from the tag commit only
+        run: echo "MAIL_FOR_ZOHO_BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Verify tag equals version sources and sits on origin/main
+        run: node scripts/verify-release-tag.mjs --tag "${{ steps.rel.outputs.tag }}"
+
+      - name: Pack immutable npm artifact
+        run: |
+          set -euo pipefail
+          npm pack --ignore-scripts
+          sha256sum ./*.tgz > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Upload artifact evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mail-for-zoho-${{ steps.rel.outputs.tag }}
+          path: |
+            *.tgz
+            SHA256SUMS
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.rel.outputs.tag }}"
+          if gh release view "$TAG" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "$TAG" ./*.tgz SHA256SUMS \
+              --repo "${GITHUB_REPOSITORY}" \
+              --clobber
+          else
+            gh release create "$TAG" ./*.tgz SHA256SUMS \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "mail-for-zoho ${TAG}" \
+              --generate-notes \
+              --verify-tag
+          fi

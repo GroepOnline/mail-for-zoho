@@ -3,6 +3,7 @@
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
+import { readProductIdentity } from './product-identity.mjs';
 import {
   bridgeInvocation,
   buildChildEnv,
@@ -42,6 +43,11 @@ export async function launchLocal({
 }
 
 async function main() {
+  if (process.argv[2] === '--version' && process.argv.length === 3) {
+    process.stdout.write(`${JSON.stringify(readProductIdentity())}\n`);
+    return;
+  }
+
   let runtime;
   try {
     runtime = await launchLocal();

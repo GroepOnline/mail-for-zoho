@@ -47,6 +47,7 @@ async function walk(dir) {
 const metadata = await readJson('chatgpt/app-metadata.json');
 const policy = await readJson('chatgpt/tool-policy.json');
 const plugin = await readJson('.codex-plugin/plugin.json');
+const pkg = await readJson('package.json');
 const mcp = await readJson('.mcp.json');
 
 assert(metadata.format === 'mail-for-zoho.chatgpt-mcp-install/v1', 'unexpected app metadata format');
@@ -82,6 +83,7 @@ for (const tool of allowed) {
 
 assert(plugin.name === 'mail-for-zoho', 'plugin name must match the public package name');
 assert(/^\d+\.\d+\.\d+$/.test(plugin.version), 'plugin version must be semantic');
+assert(plugin.version === pkg.version, 'plugin.json version must equal package.json version');
 assert(plugin.skills === './skills/zoho-mail/', 'plugin skills path must load only the generic Zoho skill');
 assert(plugin.mcpServers === './.mcp.json', 'plugin MCP path must be ./.mcp.json');
 assert(!plugin.apps, 'do not publish an .app.json reference before OpenAI assigns a real app ID');
