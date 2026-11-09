@@ -1,0 +1,11 @@
+{
+  "name": "mail-for-zoho",
+  "version": "0.4.0",
+  "description": "Open-source workflows for reading, searching and safely organizing authorized Zoho Mail inboxes through Zoho's official MCP server.",
+  "author": {
+    "name": "OnlineChefGroep",
+    "email": "chefadmin@chefgroep.online",
+    "url": "https://chefgroep.nl"
+  },
+  "skills": "./skills/zoho-mail/"
+}
