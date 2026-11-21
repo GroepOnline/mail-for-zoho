@@ -16,7 +16,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   # ref_name yields vX.Y.Z for both a tag push (refs/tags/vX.Y.Z) and a
@@ -28,14 +28,19 @@ jobs:
   release:
     name: Pack artifact and GitHub Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     timeout-minutes: 10
     steps:
       - name: Resolve tag
         id: rel
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG="${{ inputs.tag }}"
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            TAG="${INPUT_TAG}"
           else
             TAG="${GITHUB_REF_NAME}"
           fi
@@ -59,7 +64,9 @@ jobs:
           node-version: 22
 
       - name: Verify tag equals version sources and sits on origin/main
-        run: node scripts/verify-release-tag.mjs --tag "${{ steps.rel.outputs.tag }}"
+        env:
+          REL_TAG: ${{ steps.rel.outputs.tag }}
+        run: node scripts/verify-release-tag.mjs --tag "${REL_TAG}"
 
       - name: Pack immutable npm artifact
         run: |
@@ -80,9 +87,10 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          REL_TAG: ${{ steps.rel.outputs.tag }}
         run: |
           set -euo pipefail
-          TAG="${{ steps.rel.outputs.tag }}"
+          TAG="${REL_TAG}"
           if gh release view "$TAG" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
             gh release upload "$TAG" ./*.tgz SHA256SUMS \
               --repo "${GITHUB_REPOSITORY}" \
