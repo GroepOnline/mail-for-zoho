@@ -17,7 +17,8 @@
     "test:runtime": "node --test tests/runtime-security.test.mjs tests/release-contract.test.mjs",
     "check": "npm run check:config && npm run check:secrets && npm run check:submission && npm run check:public && npm run check:node && npm run test:runtime",
     "test": "npm run check",
-    "verify:remote": "node scripts/verify-remote.mjs"
+    "verify:remote": "node scripts/verify-remote.mjs",
+    "prepare": "husky"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
@@ -38,5 +39,10 @@
     "*.md",
     "*.json",
     "*.mjs"
-  ]
+  ],
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.1",
+    "prettier": "^3.10.1"
+  }
 }
